@@ -1,0 +1,52 @@
+name: Build Mission PBO
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-mission-pbo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev rsync
+
+      - name: Install armake
+        run: |
+          git clone --depth 1 https://github.com/KoffeinFlummi/armake.git /tmp/armake
+          make -C /tmp/armake
+          sudo make -C /tmp/armake install
+          armake --version
+
+      - name: Stage mission files
+        run: |
+          test -f mission.sqm
+          mkdir -p .build/mission
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.vscode/' \
+            --exclude '.build/' \
+            --exclude 'dist/' \
+            ./ .build/mission/
+
+      - name: Build PBO
+        run: |
+          mkdir -p dist
+          MISSION_NAME="$(basename "$GITHUB_WORKSPACE")"
+          armake build .build/mission "dist/${MISSION_NAME}.pbo"
+          ls -lah dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission-pbo
+          path: dist/*.pbo
+          if-no-files-found: error
