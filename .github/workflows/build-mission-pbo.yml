@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-mission-pbo:
     runs-on: ubuntu-latest
@@ -16,11 +19,26 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev rsync
+          sudo apt-get install -y build-essential libssl-dev rsync flex bison
 
       - name: Install armake
         run: |
           git clone --depth 1 https://github.com/KoffeinFlummi/armake.git /tmp/armake
+          python3 - <<'PY'
+          from pathlib import Path
+          makefile = Path("/tmp/armake/Makefile")
+          patched_lines = []
+          for line in makefile.read_text().splitlines():
+              if line.startswith(".RECIPEPREFIX"):
+                  continue
+              if line.startswith("CFLAGS =") and "-fcommon" not in line:
+                  patched_lines.append(f"{line} -fcommon")
+              elif line.startswith("    "):
+                  patched_lines.append("\t" + line[4:])
+              else:
+                  patched_lines.append(line)
+          makefile.write_text("\n".join(patched_lines) + "\n")
+          PY
           make -C /tmp/armake
           sudo make -C /tmp/armake install
           armake --version
