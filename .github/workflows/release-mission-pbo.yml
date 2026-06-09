@@ -1,0 +1,83 @@
+name: Release Mission PBO
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-mission-pbo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev rsync flex bison
+
+      - name: Install armake
+        run: |
+          git clone --depth 1 https://github.com/KoffeinFlummi/armake.git /tmp/armake
+          python3 - <<'PY'
+          from pathlib import Path
+          makefile = Path("/tmp/armake/Makefile")
+          patched_lines = []
+          for line in makefile.read_text().splitlines():
+              if line.startswith(".RECIPEPREFIX"):
+                  continue
+              if line.startswith("CFLAGS =") and "-fcommon" not in line:
+                  patched_lines.append(f"{line} -fcommon")
+              elif line.startswith("    "):
+                  patched_lines.append("\t" + line[4:])
+              else:
+                  patched_lines.append(line)
+          makefile.write_text("\n".join(patched_lines) + "\n")
+          PY
+          make -C /tmp/armake
+          sudo make -C /tmp/armake install
+          armake --version
+
+      - name: Stage mission files
+        run: |
+          test -f mission.sqm
+          mkdir -p .build/mission
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.vscode/' \
+            --exclude '.build/' \
+            --exclude 'dist/' \
+            ./ .build/mission/
+
+      - name: Build PBO
+        run: |
+          mkdir -p dist
+          MISSION_NAME="$(basename "$GITHUB_WORKSPACE")"
+          armake build .build/mission "dist/${MISSION_NAME}.pbo"
+          ls -lah dist
+
+      - name: Set release metadata
+        id: meta
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="manual-${GITHUB_RUN_NUMBER}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "name=Mission build ${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release and upload PBO
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          generate_release_notes: true
+          files: dist/*.pbo
