@@ -52,7 +52,7 @@ class KPCF_dialog {
     class controls {
 
         class KP_Help: KPGUI_PRE_DialogCrossS {
-            text = "modules\kp_cratefiller\KPCF\img\icon_help.paa";
+            text = "modules\\kp_cratefiller\\KPCF\\img\\icon_help.paa";
             x = safeZoneX + safeZoneW * (KP_X_VAL_S + KP_WIDTH_VAL_S - 0.04)
             y = KP_GETY_CROSS(KP_Y_VAL_S);
             tooltip = "$STR_KPCF_TOOLTIPHELP";
@@ -79,7 +79,7 @@ class KPCF_dialog {
         };
 
         class KP_RefreshCargo: KPGUI_PRE_CloseCross {
-            text = "modules\kp_cratefiller\KPCF\img\icon_refresh.paa";
+            text = "modules\\kp_cratefiller\\KPCF\\img\\icon_refresh.paa";
             x = KP_GETCX(KP_X_VAL_S,KP_WIDTH_VAL_S,23,24);
             y = KP_GETCY(KP_Y_VAL_S,KP_HEIGHT_VAL_S,3,48);
             w = KP_GETW(KP_WIDTH_VAL_S,24);
@@ -197,7 +197,7 @@ class KPCF_dialog {
         };
 
         class KP_DeletePreset: KPGUI_PRE_CloseCross {
-            text = "modules\kp_cratefiller\KPCF\img\icon_recyclebin.paa";
+            text = "modules\\kp_cratefiller\\KPCF\\img\\icon_recyclebin.paa";
             x = KP_GETCX(KP_X_VAL_S,KP_WIDTH_VAL_S,23,24);
             y = KP_GETCY(KP_Y_VAL_S,KP_HEIGHT_VAL_S,12,48);
             w = KP_GETW(KP_WIDTH_VAL_S,24);
