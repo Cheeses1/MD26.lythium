@@ -10,8 +10,11 @@ permissions:
   issues: write
 
 jobs:
-  build-and-release:
+  build-assets:
     runs-on: windows-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
       - name: Checkout
@@ -26,7 +29,7 @@ jobs:
           $tag = $env:GITHUB_REF_NAME
           $isPrerelease = $tag.ToLower().Contains("rc")
           "tag=$tag" >> $env:GITHUB_OUTPUT
-          "prerelease=$isPrerelease" >> $env:GITHUB_OUTPUT
+          "prerelease=$($isPrerelease.ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
       - name: Download pboman3 binaries
         id: pboman
@@ -103,16 +106,6 @@ jobs:
             Copy-Item -Path $f.FullName -Destination $dest -Force
           }
 
-      - name: Manual review for stable release
-        if: steps.version.outputs.prerelease != 'true'
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: ${{ github.actor }}
-          minimum-approvals: 1
-          issue-title: "Approve stable release ${{ steps.version.outputs.tag }}"
-          issue-body: "Please review the generated artifacts in this workflow run and approve to publish this stable release."
-
       - name: Build release body
         id: release_body
         shell: pwsh
@@ -148,12 +141,45 @@ jobs:
 
           Set-Content -Path (Join-Path $PWD "dist\release-body.md") -Value ($bodyLines -join "`r`n") -Encoding UTF8
 
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: dist/*
+
+  review-stable:
+    if: needs.build-assets.outputs.prerelease != 'true'
+    needs: build-assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual review for stable release
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: ${{ github.actor }}
+          minimum-approvals: 1
+          issue-title: "Approve stable release ${{ needs.build-assets.outputs.tag }}"
+          issue-body: "Please review the generated artifacts in this workflow run and approve to publish this stable release."
+
+  publish-release:
+    if: always() && needs.build-assets.result == 'success' && (needs.review-stable.result == 'success' || needs.review-stable.result == 'skipped')
+    needs:
+      - build-assets
+      - review-stable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: dist
+
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.tag }}
-          prerelease: ${{ steps.version.outputs.prerelease }}
+          tag_name: ${{ needs.build-assets.outputs.tag }}
+          name: ${{ needs.build-assets.outputs.tag }}
+          prerelease: ${{ needs.build-assets.outputs.prerelease }}
           generate_release_notes: true
           append_body: true
           body_path: dist/release-body.md
