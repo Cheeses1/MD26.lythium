@@ -78,7 +78,7 @@ jobs:
             throw "No PBO file was produced in dist/."
           }
 
-          $releaseAsset = "SandyTrainingMap.Lythium-${{ steps.version.outputs.tag }}.pbo"
+          $releaseAsset = "SandyTrainingMap-${{ steps.version.outputs.tag }}.Lythium.pbo"
           $releasePath = Join-Path $PWD (Join-Path "dist" $releaseAsset)
 
           Move-Item -Path $pbo.FullName -Destination $releasePath -Force
