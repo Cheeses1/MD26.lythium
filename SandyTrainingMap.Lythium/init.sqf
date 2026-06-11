@@ -154,7 +154,8 @@ _rrr_vehicles = ["E22_B_JTF_D_Truck_01_ammo_F",
 	"rhsusf_M977A4_REPAIR_usarmy_d",
 	"rhsusf_M977A4_REPAIR_BKIT_M2_usarmy_d",
 	"UK3CB_BAF_MAN_HX58_Repair_Sand",
-	"rhsusf_m113d_usarmy_supply"];
+	"rhsusf_m113d_usarmy_supply",
+	"rhsusf_stryker_m1132_m2_d"];
 
 _fortify_vehicles = ["E22_B_JTF_D_Truck_01_box_F"];
 
@@ -348,8 +349,13 @@ waitUntil {
 	[CBA_missionTime],
 	{
 		(_this select 0) setVariable ["ACE_isRepairVehicle", 1, true];
-		[(_this select 0), 5000] call ace_refuel_fnc_makeSource;
-		[(_this select 0), 5000] call ace_rearm_fnc_makeSource;
+		(_this select 0) setVariable ["ACE_isRearmVehicle", 1, true];
+		[(_this select 0), 5000, false] call ace_refuel_fnc_makeSource;
+		[(_this select 0), 5000, false] call ace_rearm_fnc_makeSource;
+		if (_this select 0) isClass "rhsusf_stryker_m1132_m2_d" then {
+			(_this select 0) lockCargo[[1,2,3,4,5,6], true];
+		}
+
 	}
 ] call grad_vehicleSpawner_fnc_addInteraction;
 
