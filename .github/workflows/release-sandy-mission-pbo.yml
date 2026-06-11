@@ -1,0 +1,93 @@
+name: Release Sandy Mission PBO
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Download pboman3 binaries
+        id: pboman
+        shell: pwsh
+        run: |
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/winseros/pboman3/releases/latest"
+          $asset = $release.assets | Where-Object { $_.name -match '^PBOManager-binaries-.*\.zip$' } | Select-Object -First 1
+
+          if (-not $asset) {
+            throw "Could not find a PBOManager binaries zip in the latest release assets."
+          }
+
+          New-Item -ItemType Directory -Force -Path tools | Out-Null
+          $zipPath = Join-Path $PWD "tools\pboman3.zip"
+
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath
+          Expand-Archive -Path $zipPath -DestinationPath "tools\pboman3" -Force
+
+          $pboc = Get-ChildItem -Path "tools\pboman3" -Recurse -Filter "pboc.exe" | Select-Object -First 1
+          $pbom = Get-ChildItem -Path "tools\pboman3" -Recurse -Filter "pbom.exe" | Select-Object -First 1
+
+          if ($pboc) {
+            $exePath = $pboc.FullName
+          } elseif ($pbom) {
+            $exePath = $pbom.FullName
+          } else {
+            throw "Neither pboc.exe nor pbom.exe was found in downloaded binaries."
+          }
+
+          "exe_path=$exePath" >> $env:GITHUB_OUTPUT
+
+      - name: Build SandyTrainingMap PBO
+        id: build
+        shell: pwsh
+        run: |
+          $missionFolder = Join-Path $PWD "SandyTrainingMap.Lythium"
+          if (-not (Test-Path $missionFolder)) {
+            throw "Mission folder not found: $missionFolder"
+          }
+
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+
+          $packer = "${{ steps.pboman.outputs.exe_path }}"
+          & "$packer" pack "$missionFolder" -o (Join-Path $PWD "dist")
+          if ($LASTEXITCODE -ne 0) {
+            throw "PBO packing failed with exit code $LASTEXITCODE"
+          }
+
+          $pbo = Get-ChildItem -Path "dist" -Filter "*.pbo" | Where-Object { $_.BaseName -eq "SandyTrainingMap.Lythium" } | Select-Object -First 1
+          if (-not $pbo) {
+            $pbo = Get-ChildItem -Path "dist" -Filter "*.pbo" | Select-Object -First 1
+          }
+          if (-not $pbo) {
+            throw "No PBO file was produced in dist/."
+          }
+
+          $releaseAsset = "SandyTrainingMap.Lythium-${{ steps.version.outputs.tag }}.pbo"
+          $releasePath = Join-Path $PWD (Join-Path "dist" $releaseAsset)
+
+          Move-Item -Path $pbo.FullName -Destination $releasePath -Force
+          "asset_path=$releasePath" >> $env:GITHUB_OUTPUT
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: ${{ steps.build.outputs.asset_path }}
