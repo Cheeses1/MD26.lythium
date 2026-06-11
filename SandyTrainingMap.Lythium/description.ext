@@ -9,13 +9,13 @@
     Otherwise copy the content below this comment block right at the end of your description.ext file, if you're unsure how to merge them.
 */
 
-#include "modules\kp_cratefiller\kp_cratefiller.hpp"
+#include "KPGUI\KPGUI_defines.hpp"
+#include "KPCF\ui\KPCF_dialog.hpp"
 #include "modules\grad-vehicleSpawner\grad_vehicleSpawner.hpp"
 
 class CfgFunctions {
-    #include "modules\kp_cratefiller\cfgFunctions.hpp"
+    #include "KPCF\KPCF_functions.hpp"
     #include "modules\grad-vehicleSpawner\cfgFunctions.hpp"
-    #include "modules\cheese-missionutils\cfgFunctions.hpp"
 };
 
 class cfgGradVehicleSpawner {
