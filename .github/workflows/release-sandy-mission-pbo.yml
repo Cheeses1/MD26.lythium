@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build-and-release:
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Resolve release version
         id: version
@@ -100,6 +103,51 @@ jobs:
             Copy-Item -Path $f.FullName -Destination $dest -Force
           }
 
+      - name: Manual review for stable release
+        if: steps.version.outputs.prerelease != 'true'
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ github.actor }}
+          minimum-approvals: 1
+          issue-title: "Approve stable release ${{ steps.version.outputs.tag }}"
+          issue-body: "Please review the generated artifacts in this workflow run and approve to publish this stable release."
+
+      - name: Build release body
+        id: release_body
+        shell: pwsh
+        run: |
+          $tag = "${{ steps.version.outputs.tag }}"
+          $previousTag = git tag --sort=-creatordate | Where-Object { $_ -ne $tag } | Select-Object -First 1
+
+          $bodyLines = @(
+            "## Included Artifacts",
+            "",
+            "- SandyTrainingMap-$tag.Lythium.pbo",
+            "- HTML preset files with -$tag suffix",
+            "",
+            "## Commit Changes",
+            ""
+          )
+
+          if ($previousTag) {
+            $bodyLines += "From $previousTag to $tag"
+            $bodyLines += ""
+            $changes = git log --pretty=format:"- %h %s" "$previousTag..$tag"
+          } else {
+            $bodyLines += "No previous tag found. Showing latest commits."
+            $bodyLines += ""
+            $changes = git log --pretty=format:"- %h %s" -n 20
+          }
+
+          if (-not $changes) {
+            $bodyLines += "- No commit changes detected."
+          } else {
+            $bodyLines += $changes
+          }
+
+          Set-Content -Path (Join-Path $PWD "dist\release-body.md") -Value ($bodyLines -join "`r`n") -Encoding UTF8
+
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -107,4 +155,6 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           prerelease: ${{ steps.version.outputs.prerelease }}
           generate_release_notes: true
+          append_body: true
+          body_path: dist/release-body.md
           files: dist/*
