@@ -7,10 +7,13 @@
     Description:
     Function defines for the KP cratefiller.
 */
+#ifndef MODULES_DIRECTORY
+    #define MODULES_DIRECTORY modules
+#endif
 
 class KPCF {
     class main {
-        file = "KPCF\fnc";
+        file = MODULES_DIRECTORY\kp_cratefiller\KPCF\fnc;
 
         // Initialize the KP cratefiller
         class init {
