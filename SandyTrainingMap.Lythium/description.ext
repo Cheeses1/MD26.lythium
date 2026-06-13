@@ -16,7 +16,7 @@
 class CfgFunctions {
     #include "modules\kp_cratefiller\KPCF\KPCF_functions.hpp"
     #include "modules\grad-vehicleSpawner\cfgFunctions.hpp"
-    #include "modules\cheeses-missionutils\cfgFunctions.hpp"
+    #include "modules\cheese-missionutils\cfgFunctions.hpp"
 };
 
 class cfgGradVehicleSpawner {
