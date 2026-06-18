@@ -12,7 +12,7 @@ class EditorData
 	};
 	class ItemIDProvider
 	{
-		nextID=3636;
+		nextID=3637;
 	};
 	class MarkerIDProvider
 	{
@@ -20,14 +20,14 @@ class EditorData
 	};
 	class LayerIndexProvider
 	{
-		nextID=299;
+		nextID=317;
 	};
 	class Camera
 	{
-		pos[]={11861.825,71.483543,2452.5364};
-		dir[]={0.90430433,-0.40711427,0.12856184};
-		up[]={0.40307769,0.91336846,0.057303626};
-		aside[]={0.14075245,-4.1627209e-07,-0.99006444};
+		pos[]={12029.375,51.723587,2218.6199};
+		dir[]={-0.02111356,-0.37620717,0.92634958};
+		up[]={-0.0085732453,0.92651123,0.37615201};
+		aside[]={0.99979168,1.0511212e-07,0.022788748};
 	};
 };
 binarizationWanted=0;
@@ -95208,7 +95208,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=289;
+		items=290;
 		class Item0
 		{
 			dataType="Marker";
@@ -623572,7 +623572,6 @@ class Mission
 			};
 			id=1891;
 			type="Land_Tablet_02_F";
-			atlOffset=0.033527374;
 		};
 		class Item243
 		{
@@ -636155,6 +636154,40 @@ class Mission
 				name="arsenal_2";
 			};
 			id=3635;
+			type="B_CargoNet_01_ammo_F";
+			class CustomAttributes
+			{
+				class Attribute0
+				{
+					property="ammoBox";
+					expression="[_this,_value] call bis_fnc_initAmmoBox;";
+					class Value
+					{
+						class data
+						{
+							singleType="STRING";
+							value="[[[[],[]],[[],[]],[[],[]],[[],[]]],false]";
+						};
+					};
+				};
+				nAttributes=1;
+			};
+		};
+		class Item289
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={12051.838,26.884996,2265.345};
+				angles[]={0.022889905,0,-0};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+				name="arsenal_7";
+			};
+			id=3636;
 			type="B_CargoNet_01_ammo_F";
 			class CustomAttributes
 			{
