@@ -95135,7 +95135,7 @@ class CustomAttributes
 							class data
 							{
 								singleType="STRING";
-								value="Sandy Training Map v0.1";
+								value="Sandy Training Map v2.2";
 							};
 						};
 						class Item2
@@ -95186,7 +95186,7 @@ class Mission
 {
 	class Intel
 	{
-		briefingName="Sandy Training Map v2.0";
+		briefingName="Sandy Training Map v2.2";
 		resistanceWest=0;
 		timeOfChanges=1800.0002;
 		startWeather=0.30000001;
@@ -95198,7 +95198,7 @@ class Mission
 		forecastLightnings=0.1;
 		wavesForced=1;
 		windForced=1;
-		year=2015;
+		year=2026;
 		month=10;
 		day=6;
 		hour=12;
