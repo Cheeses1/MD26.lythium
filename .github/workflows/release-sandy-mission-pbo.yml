@@ -183,6 +183,13 @@ jobs:
             throw "mission.sqm not found: $missionSqm"
           }
 
+          $releaseTag = "${{ steps.version.outputs.tag }}"
+          $missionSqmContent = Get-Content -Path $missionSqm -Raw
+          if ($missionSqmContent.Contains("<VERSION>")) {
+            $missionSqmContent = $missionSqmContent.Replace("<VERSION>", $releaseTag)
+            Set-Content -Path $missionSqm -Value $missionSqmContent -NoNewline
+          }
+
           $cfgConvertCandidates = @()
           if ("${{ steps.cfgconvert.outputs.exe_path }}") {
             $cfgConvertCandidates += "${{ steps.cfgconvert.outputs.exe_path }}"

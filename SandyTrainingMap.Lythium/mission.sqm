@@ -102375,7 +102375,7 @@ class Mission
 {
 	class Intel
 	{
-		briefingName="Sandy Training Map v2.0";
+		briefingName="Sandy Training Map <VERSION>";
 		resistanceWest=0;
 		timeOfChanges=1800.0002;
 		startWeather=0.30000001;
