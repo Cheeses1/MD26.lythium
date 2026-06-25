@@ -114,6 +114,7 @@ jobs:
             $steamCmdDir = Join-Path $PWD "tools\steamcmd"
             $steamCmdExe = Join-Path $steamCmdDir "steamcmd.exe"
             $arma3ToolsDir = Join-Path $PWD "tools\arma3tools"
+            $steamLog = Join-Path $PWD "tools\steamcmd-install.log"
 
             Invoke-WebRequest -Uri "https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" -OutFile $steamCmdZip
             Expand-Archive -Path $steamCmdZip -DestinationPath $steamCmdDir -Force
@@ -134,9 +135,21 @@ jobs:
               "+quit"
             )
 
-            & "$steamCmdExe" @steamArgs
-            if ($LASTEXITCODE -ne 0) {
-              throw "Failed to install Arma 3 Tools via SteamCMD (exit code $LASTEXITCODE). Verify STEAM_USERNAME/STEAM_PASSWORD (and STEAM_GUARD_CODE if required) or set CFGCONVERT_EXE directly."
+            & "$steamCmdExe" @steamArgs 2>&1 | Tee-Object -FilePath $steamLog
+            $steamExitCode = $LASTEXITCODE
+
+            if ($steamExitCode -ne 0) {
+              $steamOutput = if (Test-Path $steamLog) { Get-Content -Path $steamLog -Raw } else { "" }
+
+              if ($steamOutput -match "No subscription") {
+                throw "Steam account does not own app 233800 (Arma 3 Tools) for this CI context. Add Arma 3 Tools to that account's library first, then retry."
+              }
+
+              if ($steamOutput -match "Steam Guard|Two-factor|two factor|Invalid Password|invalid password") {
+                throw "Steam authentication failed. Re-check STEAM_USERNAME/STEAM_PASSWORD and provide a valid STEAM_GUARD_CODE if Steam Guard is required."
+              }
+
+              throw "Failed to install Arma 3 Tools via SteamCMD (exit code $steamExitCode). Verify Steam credentials/entitlements or set CFGCONVERT_EXE directly."
             }
 
             $cfgConvertExe = Get-ChildItem -Path $arma3ToolsDir -Recurse -Filter "CfgConvert.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
