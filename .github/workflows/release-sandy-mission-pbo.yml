@@ -64,6 +64,66 @@ jobs:
 
           "exe_path=$exePath" >> $env:GITHUB_OUTPUT
 
+      - name: Ensure CfgConvert is available
+        id: cfgconvert
+        shell: pwsh
+        run: |
+          $cfgConvertCandidates = @()
+          if ($env:CFGCONVERT_EXE) {
+            $cfgConvertCandidates += $env:CFGCONVERT_EXE
+          }
+
+          if ($env:ProgramFiles) {
+            $cfgConvertCandidates += (Join-Path $env:ProgramFiles "Steam\steamapps\common\Arma 3 Tools\CfgConvert\CfgConvert.exe")
+          }
+
+          if (${env:ProgramFiles(x86)}) {
+            $cfgConvertCandidates += (Join-Path ${env:ProgramFiles(x86)} "Steam\steamapps\common\Arma 3 Tools\CfgConvert\CfgConvert.exe")
+          }
+
+          $cfgConvertCandidates += "CfgConvert.exe"
+
+          $cfgConvertExe = $null
+          foreach ($candidate in $cfgConvertCandidates) {
+            if ($candidate -eq "CfgConvert.exe") {
+              $command = Get-Command $candidate -ErrorAction SilentlyContinue
+              if ($command) {
+                $cfgConvertExe = $command.Source
+              }
+            } elseif (Test-Path $candidate) {
+              $cfgConvertExe = (Resolve-Path $candidate).Path
+            }
+
+            if ($cfgConvertExe) {
+              break
+            }
+          }
+
+          if (-not $cfgConvertExe) {
+            New-Item -ItemType Directory -Force -Path tools | Out-Null
+
+            $steamCmdZip = Join-Path $PWD "tools\steamcmd.zip"
+            $steamCmdDir = Join-Path $PWD "tools\steamcmd"
+            $steamCmdExe = Join-Path $steamCmdDir "steamcmd.exe"
+            $arma3ToolsDir = Join-Path $PWD "tools\arma3tools"
+
+            Invoke-WebRequest -Uri "https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" -OutFile $steamCmdZip
+            Expand-Archive -Path $steamCmdZip -DestinationPath $steamCmdDir -Force
+
+            & "$steamCmdExe" +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +force_install_dir "$arma3ToolsDir" +login anonymous +app_update 233800 validate +quit
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to install Arma 3 Tools via SteamCMD (exit code $LASTEXITCODE)."
+            }
+
+            $cfgConvertExe = Get-ChildItem -Path $arma3ToolsDir -Recurse -Filter "CfgConvert.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+          }
+
+          if (-not $cfgConvertExe) {
+            throw "CfgConvert.exe was not found after installation attempt. Set CFGCONVERT_EXE to a valid path if needed."
+          }
+
+          "exe_path=$cfgConvertExe" >> $env:GITHUB_OUTPUT
+
       - name: Build SandyTrainingMap PBO
         id: build
         shell: pwsh
@@ -72,6 +132,64 @@ jobs:
           if (-not (Test-Path $missionFolder)) {
             throw "Mission folder not found: $missionFolder"
           }
+
+          $missionSqm = Join-Path $missionFolder "mission.sqm"
+          if (-not (Test-Path $missionSqm)) {
+            throw "mission.sqm not found: $missionSqm"
+          }
+
+          $cfgConvertCandidates = @()
+          if ("${{ steps.cfgconvert.outputs.exe_path }}") {
+            $cfgConvertCandidates += "${{ steps.cfgconvert.outputs.exe_path }}"
+          }
+
+          if ($env:CFGCONVERT_EXE) {
+            $cfgConvertCandidates += $env:CFGCONVERT_EXE
+          }
+
+          if ($env:ProgramFiles) {
+            $cfgConvertCandidates += (Join-Path $env:ProgramFiles "Steam\steamapps\common\Arma 3 Tools\CfgConvert\CfgConvert.exe")
+          }
+
+          if (${env:ProgramFiles(x86)}) {
+            $cfgConvertCandidates += (Join-Path ${env:ProgramFiles(x86)} "Steam\steamapps\common\Arma 3 Tools\CfgConvert\CfgConvert.exe")
+          }
+
+          $cfgConvertCandidates += "CfgConvert.exe"
+
+          $cfgConvertExe = $null
+          foreach ($candidate in $cfgConvertCandidates) {
+            if ($candidate -eq "CfgConvert.exe") {
+              $command = Get-Command $candidate -ErrorAction SilentlyContinue
+              if ($command) {
+                $cfgConvertExe = $command.Source
+              }
+            } elseif (Test-Path $candidate) {
+              $cfgConvertExe = (Resolve-Path $candidate).Path
+            }
+
+            if ($cfgConvertExe) {
+              break
+            }
+          }
+
+          if (-not $cfgConvertExe) {
+            throw "CfgConvert.exe was not found. Set CFGCONVERT_EXE or install Arma 3 Tools on the runner before packing."
+          }
+
+          $binarizedMissionSqm = Join-Path $missionFolder "mission.sqm.bin"
+
+          # Try known CfgConvert invocation styles to maximize compatibility across tool versions.
+          & "$cfgConvertExe" -bin -dst "$binarizedMissionSqm" "$missionSqm"
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $binarizedMissionSqm)) {
+            & "$cfgConvertExe" -bin "$missionSqm" "$binarizedMissionSqm"
+          }
+
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $binarizedMissionSqm)) {
+            throw "Binarization of mission.sqm failed with CfgConvert.exe"
+          }
+
+          Move-Item -Path $binarizedMissionSqm -Destination $missionSqm -Force
 
           New-Item -ItemType Directory -Force -Path dist | Out-Null
 
