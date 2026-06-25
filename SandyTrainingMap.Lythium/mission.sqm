@@ -12,7 +12,7 @@ class EditorData
 	};
 	class ItemIDProvider
 	{
-		nextID=3644;
+		nextID=3645;
 	};
 	class MarkerIDProvider
 	{
@@ -24,10 +24,10 @@ class EditorData
 	};
 	class Camera
 	{
-		pos[]={12127.681,76.055283,2178.1658};
-		dir[]={-0.30433699,-0.47728798,0.82442254};
-		up[]={-0.16529615,0.87874061,0.44776803};
-		aside[]={0.93816465,1.1443626e-07,0.3463296};
+		pos[]={12166.096,28.478071,2269.2473};
+		dir[]={0.95930636,-0.24123156,0.14709374};
+		up[]={0.2384755,0.97046196,0.036568072};
+		aside[]={0.1515733,1.1574011e-06,-0.98849583};
 	};
 };
 binarizationWanted=0;
@@ -104,13 +104,14 @@ addons[]=
 	"Uniforms_F_Levi",
 	"vests_f_JCA_IE",
 	"ace_explosives",
-	"A3_Characters_F_Mark"
+	"A3_Characters_F_Mark",
+	"A3_Structures_F_Ind_AirPort"
 };
 class AddonsMetaData
 {
 	class List
 	{
-		items=49;
+		items=50;
 		class Item0
 		{
 			className="A3_Ui_F";
@@ -442,6 +443,13 @@ class AddonsMetaData
 		{
 			className="A3_Characters_F_Mark";
 			name="Arma 3 Marksmen - Characters and Clothing";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
+		class Item49
+		{
+			className="A3_Structures_F_Ind";
+			name="Arma 3 - Industrial Structures";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
@@ -94787,7 +94795,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=290;
+		items=291;
 		class Item0
 		{
 			dataType="Marker";
@@ -240799,6 +240807,22 @@ class Mission
 			};
 			id=3643;
 			atlOffset=-0.0019512177;
+		};
+		class Item290
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={12173.794,26.271681,2268.9661};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=3644;
+			type="Land_LandMark_F";
+			atlOffset=5.7220459e-06;
 		};
 	};
 };
