@@ -22,7 +22,7 @@ The mission folder contains additional configuration and module files. Its own R
 ## Credits and source
 
 - **Mission authors — Cheese Boi & KryoX2.** Credited in the mission metadata in [`mission.sqm`](SandyTrainingMap.Lythium/mission.sqm). The mission source is maintained in this [repository](https://github.com/Cheeses1/MD26.lythium).
-- **Cheese Mission Utilities — Cheese.** The module describes itself as Cheese's Missing Utils. Its [arsenal helper source](SandyTrainingMap.Lythium/modules/cheese-missionutils/functions/curator/fn_arsenal.sqf) and [usage documentation](SandyTrainingMap.Lythium/modules/cheese-missionutils/README.md) are included here.
+- **Cheese Mission Utilities — Cheese.** The module describes itself as Cheese's Mission Utils. Its [arsenal helper source](SandyTrainingMap.Lythium/modules/cheese-missionutils/functions/curator/fn_arsenal.sqf) and [usage documentation](SandyTrainingMap.Lythium/modules/cheese-missionutils/README.md) are included here.
 - **Player-hit alert script — Belhun and Cutup (4th ARMCO).** The attribution appears in the header of [`initPlayerLocal.sqf`](SandyTrainingMap.Lythium/initPlayerLocal.sqf). See the [4th ARMCO Lythium mission source](https://github.com/Cheeses1/MD26.4thArmco.lythium).
 
 ### Third-party modules
