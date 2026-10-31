@@ -1,3 +1,5 @@
+# note from cheese: honestly, I still don't get how the KPCF works, but I know it does. If you want to change the spawn object, just change the KPCF_cratefillerSpawn variable and the KPCF_cratefillerBase variable to whatever object you want. The spawn object is where the crates will spawn and acts as the center for the KPCF_spawnRadius variable. The KPCF_spawnRadius variable defines the range where inventories can be edited. The KPCF_interactRadius variable defines the distance for interaction (addAction / ACE). The KPCF_canSpawnAndDelete variable defines if the player will be able to spawn and delete crates. The KPCF_generateLists variable defines if the item lists will be generated from the config. The KPCF_crates variable defines which crates can be spawned. The KPCF_blacklistedItems variable defines which items are blacklisted and cannot be spawned.
+
 KPCF_cratefillerBase = [
 	"Land_Cargo20_EMP_Training_F"
 
