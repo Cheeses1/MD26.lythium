@@ -21,16 +21,16 @@ The mission folder contains additional configuration and module files. Its own R
 
 ## Credits and source
 
-- **Mission authors — Cheese Boi & KryoX2.** Credited in the mission metadata in [`mission.sqm`](SandyTrainingMap.Lythium/mission.sqm). The mission source is maintained in this [repository](https://github.com/Cheeses1/MD26.lythium).
-- **Cheese Mission Utilities — Cheese.** The module describes itself as Cheese's Mission Utils. Its [arsenal helper source](SandyTrainingMap.Lythium/modules/cheese-missionutils/functions/curator/fn_arsenal.sqf) and [usage documentation](SandyTrainingMap.Lythium/modules/cheese-missionutils/README.md) are included here.
-- **Player-hit alert script — Belhun and Cutup (4th ARMCO).** The attribution appears in the header of [`initPlayerLocal.sqf`](SandyTrainingMap.Lythium/initPlayerLocal.sqf). See the [4th ARMCO Lythium mission source](https://github.com/Cheeses1/MD26.4thArmco.lythium).
+- **Mission authors — Cheese Boi & KryoX2.** The mission/map were made by Cheese Boi and KryoX2 from the 4th Bat ARMCO Unit. The mission source is maintained in this [repository](https://github.com/Cheeses1/MD26.lythium).
+- **Cheese Mission Utilities — Cheese Boi.** The module was made by Cheese Boi from the 4th Bat ARMCO Unit. Its [arsenal helper source](SandyTrainingMap.Lythium/modules/cheese-missionutils/functions/curator/fn_arsenal.sqf) and [usage documentation](SandyTrainingMap.Lythium/modules/cheese-missionutils/README.md) are included here.
+- **Player-hit alert script — Belhun and Cutup (4th ARMCO).** The friendly-fire alert script was created by Belhun and Cutup from the 4th Bat ARMCO Unit. See the [4th ARMCO Lythium mission source](https://github.com/Cheeses1/MD26.4thArmco.lythium).
 
 ### Third-party modules
 
 These modules are included in the mission but are separate works. Their authors retain their respective copyrights and licensing terms; the repository's root license does not replace those terms.
 
 - **GRAD Vehicle Spawner — Gruppe Adler; upstream package credits McDiod as a contributor.** Included under [`SandyTrainingMap.Lythium/modules/grad-vehicleSpawner/`](SandyTrainingMap.Lythium/modules/grad-vehicleSpawner/). See the [upstream source repository](https://github.com/gruppe-adler/grad-vehicleSpawner) and its [module documentation](SandyTrainingMap.Lythium/modules/grad-vehicleSpawner/README.md).
-- **KP Cratefiller — Killah Potatoes; upstream credits Dubjunk for the module and Wyqer for the GUI components.** Included under [`SandyTrainingMap.Lythium/modules/kp_cratefiller/`](SandyTrainingMap.Lythium/modules/kp_cratefiller/). See the [upstream source repository](https://github.com/KillahPotatoes/KP-Cratefiller). The upstream project identifies its license as GNU GPL version 3 or (at your option) any later version; consult its source for the applicable terms.
+- **KP Cratefiller — Killah Potatoes; upstream credits Dubjunk for the module and Wyqer for the GUI components.** Included under [`SandyTrainingMap.Lythium/modules/kp_cratefiller/`](SandyTrainingMap.Lythium/modules/kp_cratefiller/). See the [upstream source repository](https://github.com/KillahPotatoes/KP-Cratefiller). The upstream project identifies its license as GNU GPL version 3; consult its source for the applicable terms.
 
 ## License
 
